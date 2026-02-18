@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'wouter';
-import { ChevronLeft, CreditCard, Lock, Shield, Check } from 'lucide-react';
+import { ChevronLeft, CreditCard, Lock, Shield, Check, Smartphone, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useState, useEffect } from 'react';
@@ -55,7 +54,6 @@ export default function Checkout() {
     }
 
     if (product) {
-      // Map product slugs to names
       const productNames: Record<string, string> = {
         'cloudsync': 'CloudSync',
         'devtools': 'DevTools Pro',
@@ -93,11 +91,9 @@ export default function Checkout() {
 
     const plan = plans[selectedPlan];
     
-    // In production, you would create an order on your backend
-    // and get the order_id from there
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_YOUR_KEY_HERE',
-      amount: plan.price * 100, // Amount in paise
+      amount: plan.price * 100,
       currency: 'INR',
       name: 'Pioneers',
       description: `${productName} - ${plan.name} Plan`,
@@ -110,7 +106,6 @@ export default function Checkout() {
           plan: plan.name,
           amount: plan.price
         });
-        // Here you would verify the payment on your backend
         setTimeout(() => {
           setLocation('/');
         }, 2000);
@@ -140,7 +135,6 @@ export default function Checkout() {
   };
 
   const handleStripePayment = async () => {
-    // In production, you would integrate with Stripe Elements
     toast.info('Stripe integration coming soon! Use Razorpay for now.');
     setIsProcessing(false);
   };
@@ -157,10 +151,8 @@ export default function Checkout() {
 
     try {
       if (paymentMethod === 'card' || paymentMethod === 'upi' || paymentMethod === 'netbanking') {
-        // Use Razorpay for Indian payments
         await handleRazorpayPayment();
       } else {
-        // Use Stripe for international payments
         await handleStripePayment();
       }
     } catch (error) {
@@ -231,27 +223,34 @@ export default function Checkout() {
                       </div>
 
                       <h2 className="text-2xl font-bold text-white mb-4">Select Plan</h2>
-                      <RadioGroup value={selectedPlan} onValueChange={(value) => setSelectedPlan(value as keyof typeof plans)}>
+                      <div className="space-y-3">
                         {Object.entries(plans).map(([key, plan]) => (
-                          <div
+                          <button
                             key={key}
-                            className={`flex items-center space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                              selectedPlan === key
-                                ? 'border-cyan-500 bg-cyan-500/10'
-                                : 'border-slate-700 hover:border-slate-600'
-                            }`}
+                            type="button"
                             onClick={() => setSelectedPlan(key as keyof typeof plans)}
+                            className={`w-full flex items-center justify-between p-5 rounded-xl border-2 transition-all ${
+                              selectedPlan === key
+                                ? 'border-cyan-500 bg-cyan-500/10 shadow-lg shadow-cyan-500/20'
+                                : 'border-slate-700 bg-slate-800/30 hover:border-slate-600 hover:bg-slate-800/50'
+                            }`}
                           >
-                            <RadioGroupItem value={key} id={key} />
-                            <Label htmlFor={key} className="flex-1 cursor-pointer">
-                              <div className="flex justify-between items-center">
-                                <span className="text-white font-semibold">{plan.name}</span>
-                                <span className="text-cyan-400 font-bold">{plan.priceDisplay}/month</span>
+                            <div className="flex items-center gap-4">
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                selectedPlan === key
+                                  ? 'border-cyan-500 bg-cyan-500'
+                                  : 'border-slate-600'
+                              }`}>
+                                {selectedPlan === key && (
+                                  <div className="w-2 h-2 bg-white rounded-full" />
+                                )}
                               </div>
-                            </Label>
-                          </div>
+                              <span className="text-white font-semibold text-lg">{plan.name}</span>
+                            </div>
+                            <span className="text-cyan-400 font-bold text-lg">{plan.priceDisplay}/month</span>
+                          </button>
                         ))}
-                      </RadioGroup>
+                      </div>
                     </div>
 
                     {/* Contact Information */}
@@ -267,7 +266,7 @@ export default function Checkout() {
                             onChange={handleInputChange}
                             placeholder="John Doe"
                             required
-                            className="bg-slate-800/50 border-slate-700 text-white"
+                            className="bg-slate-800/50 border-slate-700 text-white placeholder:text-gray-500 focus:border-cyan-500"
                           />
                         </div>
                         <div>
@@ -280,7 +279,7 @@ export default function Checkout() {
                             onChange={handleInputChange}
                             placeholder="john@example.com"
                             required
-                            className="bg-slate-800/50 border-slate-700 text-white"
+                            className="bg-slate-800/50 border-slate-700 text-white placeholder:text-gray-500 focus:border-cyan-500"
                           />
                         </div>
                         <div>
@@ -291,7 +290,7 @@ export default function Checkout() {
                             value={formData.company}
                             onChange={handleInputChange}
                             placeholder="Acme Inc."
-                            className="bg-slate-800/50 border-slate-700 text-white"
+                            className="bg-slate-800/50 border-slate-700 text-white placeholder:text-gray-500 focus:border-cyan-500"
                           />
                         </div>
                         <div>
@@ -304,7 +303,7 @@ export default function Checkout() {
                             onChange={handleInputChange}
                             placeholder="+91 98765 43210"
                             required
-                            className="bg-slate-800/50 border-slate-700 text-white"
+                            className="bg-slate-800/50 border-slate-700 text-white placeholder:text-gray-500 focus:border-cyan-500"
                           />
                         </div>
                       </div>
@@ -313,50 +312,73 @@ export default function Checkout() {
                     {/* Payment Method */}
                     <div>
                       <h2 className="text-2xl font-bold text-white mb-4">Payment Method</h2>
-                      <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                        <div
-                          className={`flex items-center space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                            paymentMethod === 'card'
-                              ? 'border-cyan-500 bg-cyan-500/10'
-                              : 'border-slate-700 hover:border-slate-600'
-                          }`}
+                      <div className="space-y-3">
+                        <button
+                          type="button"
                           onClick={() => setPaymentMethod('card')}
-                        >
-                          <RadioGroupItem value="card" id="card" />
-                          <Label htmlFor="card" className="flex-1 cursor-pointer flex items-center">
-                            <CreditCard className="w-5 h-5 mr-3 text-cyan-400" />
-                            <span className="text-white font-semibold">Credit/Debit Card</span>
-                          </Label>
-                        </div>
-
-                        <div
-                          className={`flex items-center space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                            paymentMethod === 'upi'
-                              ? 'border-cyan-500 bg-cyan-500/10'
-                              : 'border-slate-700 hover:border-slate-600'
+                          className={`w-full flex items-center gap-4 p-5 rounded-xl border-2 transition-all ${
+                            paymentMethod === 'card'
+                              ? 'border-cyan-500 bg-cyan-500/10 shadow-lg shadow-cyan-500/20'
+                              : 'border-slate-700 bg-slate-800/30 hover:border-slate-600 hover:bg-slate-800/50'
                           }`}
+                        >
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            paymentMethod === 'card'
+                              ? 'border-cyan-500 bg-cyan-500'
+                              : 'border-slate-600'
+                          }`}>
+                            {paymentMethod === 'card' && (
+                              <div className="w-2 h-2 bg-white rounded-full" />
+                            )}
+                          </div>
+                          <CreditCard className="w-5 h-5 text-cyan-400" />
+                          <span className="text-white font-semibold">Credit/Debit Card</span>
+                        </button>
+
+                        <button
+                          type="button"
                           onClick={() => setPaymentMethod('upi')}
-                        >
-                          <RadioGroupItem value="upi" id="upi" />
-                          <Label htmlFor="upi" className="flex-1 cursor-pointer">
-                            <span className="text-white font-semibold">UPI (GPay, PhonePe, Paytm)</span>
-                          </Label>
-                        </div>
-
-                        <div
-                          className={`flex items-center space-x-3 p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                            paymentMethod === 'netbanking'
-                              ? 'border-cyan-500 bg-cyan-500/10'
-                              : 'border-slate-700 hover:border-slate-600'
+                          className={`w-full flex items-center gap-4 p-5 rounded-xl border-2 transition-all ${
+                            paymentMethod === 'upi'
+                              ? 'border-cyan-500 bg-cyan-500/10 shadow-lg shadow-cyan-500/20'
+                              : 'border-slate-700 bg-slate-800/30 hover:border-slate-600 hover:bg-slate-800/50'
                           }`}
-                          onClick={() => setPaymentMethod('netbanking')}
                         >
-                          <RadioGroupItem value="netbanking" id="netbanking" />
-                          <Label htmlFor="netbanking" className="flex-1 cursor-pointer">
-                            <span className="text-white font-semibold">Net Banking</span>
-                          </Label>
-                        </div>
-                      </RadioGroup>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            paymentMethod === 'upi'
+                              ? 'border-cyan-500 bg-cyan-500'
+                              : 'border-slate-600'
+                          }`}>
+                            {paymentMethod === 'upi' && (
+                              <div className="w-2 h-2 bg-white rounded-full" />
+                            )}
+                          </div>
+                          <Smartphone className="w-5 h-5 text-cyan-400" />
+                          <span className="text-white font-semibold">UPI (GPay, PhonePe, Paytm)</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod('netbanking')}
+                          className={`w-full flex items-center gap-4 p-5 rounded-xl border-2 transition-all ${
+                            paymentMethod === 'netbanking'
+                              ? 'border-cyan-500 bg-cyan-500/10 shadow-lg shadow-cyan-500/20'
+                              : 'border-slate-700 bg-slate-800/30 hover:border-slate-600 hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            paymentMethod === 'netbanking'
+                              ? 'border-cyan-500 bg-cyan-500'
+                              : 'border-slate-600'
+                          }`}>
+                            {paymentMethod === 'netbanking' && (
+                              <div className="w-2 h-2 bg-white rounded-full" />
+                            )}
+                          </div>
+                          <Building2 className="w-5 h-5 text-cyan-400" />
+                          <span className="text-white font-semibold">Net Banking</span>
+                        </button>
+                      </div>
                     </div>
 
                     {/* Submit Button */}
