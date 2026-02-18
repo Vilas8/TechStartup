@@ -33,18 +33,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/product/devtools">
-                  <button className="hover:text-cyan-400 transition-colors">DevTools Pro</button>
+                <Link href="/product/devflow">
+                  <button className="hover:text-cyan-400 transition-colors">DevFlow</button>
                 </Link>
               </li>
               <li>
-                <Link href="/product/dataforge">
-                  <button className="hover:text-cyan-400 transition-colors">DataForge</button>
-                </Link>
-              </li>
-              <li>
-                <Link href="/product/secureauth">
-                  <button className="hover:text-cyan-400 transition-colors">SecureAuth</button>
+                <Link href="/product/teamhub">
+                  <button className="hover:text-cyan-400 transition-colors">TeamHub</button>
                 </Link>
               </li>
             </ul>
@@ -54,11 +49,6 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="font-bold text-white">Company</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>
-                <Link href="/about">
-                  <button className="hover:text-cyan-400 transition-colors">About Us</button>
-                </Link>
-              </li>
               <li>
                 <Link href="/team">
                   <button className="hover:text-cyan-400 transition-colors">Our Team</button>
@@ -70,8 +60,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/products">
+                  <button className="hover:text-cyan-400 transition-colors">All Products</button>
+                </Link>
+              </li>
+              <li>
                 <Link href="/contact">
-                  <button className="hover:text-cyan-400 transition-colors">Contact</button>
+                  <button className="hover:text-cyan-400 transition-colors">Contact Us</button>
                 </Link>
               </li>
             </ul>
@@ -96,10 +91,11 @@ export default function Footer() {
               <h4 className="font-bold text-white mb-4">Connect</h4>
               <div className="flex gap-4">
                 <a
-                  href="https://github.com"
+                  href="https://github.com/Vilas8"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-full bg-slate-800 hover:bg-cyan-500/20 transition-colors"
+                  aria-label="GitHub"
                 >
                   <Github className="w-4 h-4 text-cyan-400" />
                 </a>
@@ -108,6 +104,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-full bg-slate-800 hover:bg-purple-500/20 transition-colors"
+                  aria-label="LinkedIn"
                 >
                   <Linkedin className="w-4 h-4 text-purple-400" />
                 </a>
@@ -116,11 +113,12 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-full bg-slate-800 hover:bg-cyan-500/20 transition-colors"
+                  aria-label="Twitter"
                 >
                   <Twitter className="w-4 h-4 text-cyan-400" />
                 </a>
                 <Link href="/contact">
-                  <div className="p-2 rounded-full bg-slate-800 hover:bg-purple-500/20 transition-colors cursor-pointer">
+                  <div className="p-2 rounded-full bg-slate-800 hover:bg-purple-500/20 transition-colors cursor-pointer" aria-label="Email">
                     <Mail className="w-4 h-4 text-purple-400" />
                   </div>
                 </Link>
