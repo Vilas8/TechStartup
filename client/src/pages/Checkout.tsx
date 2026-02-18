@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 const plans = {
@@ -15,33 +15,56 @@ const plans = {
     name: 'Starter',
     price: 49999,
     priceDisplay: '₹49,999',
-    features: ['All basic features', '24/7 Priority Support', '99.99% SLA']
+    features: ['All basic features', '24/7 Priority Support', '99.99% SLA', '10 GB Storage', '100 API Calls/day']
   },
   professional: {
     name: 'Professional',
     price: 149999,
     priceDisplay: '₹1,49,999',
-    features: ['All basic features', '24/7 Priority Support', '99.99% SLA', 'Advanced Analytics', 'Custom Integrations']
+    features: ['All basic features', '24/7 Priority Support', '99.99% SLA', 'Advanced Analytics', 'Custom Integrations', '100 GB Storage']
   },
   enterprise: {
     name: 'Enterprise',
     price: 499999,
     priceDisplay: '₹4,99,999',
-    features: ['All basic features', '24/7 Priority Support', '99.99% SLA', 'Advanced Analytics', 'Custom Integrations', 'Dedicated Support', 'SLA Guarantee']
+    features: ['All basic features', '24/7 Priority Support', '99.99% SLA', 'Advanced Analytics', 'Custom Integrations', 'Dedicated Support', 'Unlimited Storage']
   }
 };
 
 export default function Checkout() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [selectedPlan, setSelectedPlan] = useState<keyof typeof plans>('professional');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [productName, setProductName] = useState('CloudSync');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     company: '',
     phone: ''
   });
+
+  // Parse URL parameters on component mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get('plan');
+    const product = params.get('product');
+
+    if (plan && plans[plan as keyof typeof plans]) {
+      setSelectedPlan(plan as keyof typeof plans);
+    }
+
+    if (product) {
+      // Map product slugs to names
+      const productNames: Record<string, string> = {
+        'cloudsync': 'CloudSync',
+        'devtools': 'DevTools Pro',
+        'dataforge': 'DataForge',
+        'secureauth': 'SecureAuth'
+      };
+      setProductName(productNames[product] || 'CloudSync');
+    }
+  }, [location]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -73,15 +96,20 @@ export default function Checkout() {
     // In production, you would create an order on your backend
     // and get the order_id from there
     const options = {
-      key: 'rzp_test_YOUR_KEY_HERE', // Replace with your Razorpay key
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_YOUR_KEY_HERE',
       amount: plan.price * 100, // Amount in paise
       currency: 'INR',
       name: 'Pioneers',
-      description: `${plan.name} Plan - Monthly Subscription`,
+      description: `${productName} - ${plan.name} Plan`,
       image: '/logo.png',
       handler: function (response: any) {
         toast.success('Payment successful! Your subscription is now active.');
         console.log('Payment ID:', response.razorpay_payment_id);
+        console.log('Order Details:', {
+          product: productName,
+          plan: plan.name,
+          amount: plan.price
+        });
         // Here you would verify the payment on your backend
         setTimeout(() => {
           setLocation('/');
@@ -91,6 +119,10 @@ export default function Checkout() {
         name: formData.fullName,
         email: formData.email,
         contact: formData.phone
+      },
+      notes: {
+        product: productName,
+        plan: plan.name
       },
       theme: {
         color: '#06b6d4'
@@ -124,7 +156,7 @@ export default function Checkout() {
     setIsProcessing(true);
 
     try {
-      if (paymentMethod === 'card' || paymentMethod === 'upi') {
+      if (paymentMethod === 'card' || paymentMethod === 'upi' || paymentMethod === 'netbanking') {
         // Use Razorpay for Indian payments
         await handleRazorpayPayment();
       } else {
@@ -171,7 +203,7 @@ export default function Checkout() {
               Secure Checkout
             </h1>
             <p className="text-xl text-gray-400">
-              Complete your subscription in a few simple steps
+              Complete your {productName} subscription in a few simple steps
             </p>
           </motion.div>
         </div>
@@ -191,8 +223,13 @@ export default function Checkout() {
                   className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-8"
                 >
                   <form onSubmit={handleSubmit} className="space-y-8">
-                    {/* Plan Selection */}
+                    {/* Product & Plan Selection */}
                     <div>
+                      <h2 className="text-2xl font-bold text-white mb-2">Selected Product</h2>
+                      <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-slate-700 rounded-lg p-4 mb-6">
+                        <p className="text-cyan-400 font-bold text-lg">{productName}</p>
+                      </div>
+
                       <h2 className="text-2xl font-bold text-white mb-4">Select Plan</h2>
                       <RadioGroup value={selectedPlan} onValueChange={(value) => setSelectedPlan(value as keyof typeof plans)}>
                         {Object.entries(plans).map(([key, plan]) => (
@@ -370,6 +407,10 @@ export default function Checkout() {
                   
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between text-gray-300">
+                      <span>Product</span>
+                      <span className="text-cyan-400">{productName}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
                       <span>{currentPlan.name} Plan</span>
                       <span>{currentPlan.priceDisplay}</span>
                     </div>
@@ -390,8 +431,8 @@ export default function Checkout() {
                     <div className="space-y-2">
                       {currentPlan.features.map((feature, index) => (
                         <div key={index} className="flex items-center text-gray-300">
-                          <Check className="w-4 h-4 mr-2 text-cyan-400" />
-                          {feature}
+                          <Check className="w-4 h-4 mr-2 text-cyan-400 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
                         </div>
                       ))}
                     </div>

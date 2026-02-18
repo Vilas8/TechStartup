@@ -10,6 +10,10 @@ import { motion } from "framer-motion";
 export default function Pricing() {
   const [, setLocation] = useLocation();
 
+  const handleGetStarted = (planTier: string, productSlug: string) => {
+    setLocation(`/checkout?plan=${planTier}&product=${productSlug}`);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <Navbar />
@@ -92,7 +96,7 @@ export default function Pricing() {
                       </div>
 
                       <Button
-                        onClick={() => setLocation('/checkout')}
+                        onClick={() => handleGetStarted(plan.tier, product.slug)}
                         className={`w-full mb-6 h-11 font-semibold transition-all ${
                           plan.tier === "professional"
                             ? "bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white"
@@ -219,7 +223,7 @@ export default function Pricing() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                onClick={() => setLocation('/checkout')}
+                onClick={() => handleGetStarted('professional', 'cloudsync')}
                 className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white h-12 px-8 text-base font-semibold"
               >
                 Start Now
